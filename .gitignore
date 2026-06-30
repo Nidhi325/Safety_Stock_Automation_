@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+
+# Database (will be rebuilt on first run)
+safety_stock.db
+*.db
+
+# Environment
+.env
+.env.*
+
+# Temporary upload folder
+Monthly_upload/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Streamlit local
+.streamlit/secrets.toml

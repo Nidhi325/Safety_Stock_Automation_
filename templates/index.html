@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Safety Stock Automation Portal</title>
+    <!-- Google Fonts: Inter & Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-box">
+                    <span>SS</span>
+                </div>
+                <div class="brand-text">
+                    <h1>Safety Stock</h1>
+                    <p>Automation Portal</p>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-view="dashboard">
+                    <i data-lucide="layout-dashboard"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-item" data-view="directory">
+                    <i data-lucide="folder-search"></i>
+                    <span>Inventory Directory</span>
+                </a>
+                <a href="#" class="nav-item" data-view="pipeline">
+                    <i data-lucide="cpu"></i>
+                    <span>Pipeline Control</span>
+                </a>
+                <a href="#" class="nav-item" data-view="analytics">
+                    <i data-lucide="bar-chart-3"></i>
+                    <span>Executive Analytics</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <header class="top-bar">
+                <div class="view-title">
+                    <h2 id="current-view-title">Dashboard</h2>
+                </div>
+                <div class="user-profile">
+                    <div class="badge">Enterprise Edition</div>
+                </div>
+            </header>
+
+            <!-- Views Container -->
+            <div class="views-wrapper">
+                
+                <!-- 1. DASHBOARD VIEW -->
+                <section id="view-dashboard" class="view-section active">
+                    <!-- Search Bar Section -->
+                    <div class="search-hero-card">
+                        <h3>Analyze Material Inventory</h3>
+                        <p>Input a unique Material ID to retrieve historical consumption, forecasts, and safety stock recommendations.</p>
+                        <div class="search-input-wrapper">
+                            <i data-lucide="search" class="search-icon"></i>
+                            <input type="text" id="material-search-input" placeholder="Search by Material ID (e.g. 100002)..." autocomplete="off">
+                            <button id="material-search-btn" class="btn btn-primary">Analyze</button>
+                        </div>
+                    </div>
+
+                    <!-- Welcome Card (Shown before any search) -->
+                    <div id="dashboard-welcome" class="dashboard-card welcome-state">
+                        <i data-lucide="boxes" class="welcome-icon"></i>
+                        <h4>No Material Selected</h4>
+                        <p>Enter a Material ID in the search bar above, or browse the <a href="#" onclick="switchView('directory'); return false;">Inventory Directory</a> to select one.</p>
+                    </div>
+
+                    <!-- Dashboard Results (Hidden initially) -->
+                    <div id="dashboard-results" class="dashboard-results-grid hidden">
+                        <!-- KPI Row -->
+                        <div class="kpi-grid">
+                            <!-- Card 1: Material ID -->
+                            <div class="kpi-card">
+                                <div class="kpi-icon-wrapper blue"><i data-lucide="hash"></i></div>
+                                <div class="kpi-details">
+                                    <span class="kpi-label">Material ID</span>
+                                    <h3 class="kpi-value" id="kpi-material-id">-</h3>
+                                </div>
+                            </div>
+                            <!-- Card 2: Current Stock -->
+                            <div class="kpi-card">
+                                <div class="kpi-icon-wrapper"><i data-lucide="package"></i></div>
+                                <div class="kpi-details">
+                                    <span class="kpi-label">Unrestricted Stock</span>
+                                    <h3 class="kpi-value" id="kpi-current-stock">-</h3>
+                                </div>
+                            </div>
+                            <!-- Card 3: Recommended Safety Stock -->
+                            <div class="kpi-card highlight">
+                                <div class="kpi-icon-wrapper glow"><i data-lucide="shield-check"></i></div>
+                                <div class="kpi-details">
+                                    <span class="kpi-label">Recommended Safety Stock</span>
+                                    <h3 class="kpi-value" id="kpi-safety-stock">-</h3>
+                                </div>
+                            </div>
+                            <!-- Card 4: Predicted Consumption -->
+                            <div class="kpi-card">
+                                <div class="kpi-icon-wrapper"><i data-lucide="trending-up"></i></div>
+                                <div class="kpi-details">
+                                    <span class="kpi-label">Predicted Consumption</span>
+                                    <h3 class="kpi-value" id="kpi-predicted-consumption">-</h3>
+                                </div>
+                            </div>
+                            <!-- Card 5: Reorder Point -->
+                            <div class="kpi-card">
+                                <div class="kpi-icon-wrapper"><i data-lucide="bell"></i></div>
+                                <div class="kpi-details">
+                                    <span class="kpi-label">Reorder Point</span>
+                                    <h3 class="kpi-value" id="kpi-reorder-point">-</h3>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Chart & Details Section -->
+                        <div class="results-layout">
+                            <!-- Left: Chart Card -->
+                            <div class="dashboard-card chart-card">
+                                <div class="card-header">
+                                    <h4><i data-lucide="line-chart"></i> Historical Demand & SES Forecast</h4>
+                                    <span class="badge" id="forecast-date-badge">Next Month</span>
+                                </div>
+                                <div class="chart-wrapper">
+                                    <canvas id="demandChart"></canvas>
+                                </div>
+                            </div>
+
+                            <!-- Right: Detailed Specifications -->
+                            <div class="dashboard-card specs-card">
+                                <div class="card-header">
+                                    <h4><i data-lucide="file-text"></i> Material Specifications</h4>
+                                </div>
+                                <div class="specs-grid">
+                                    <div class="spec-item">
+                                        <span class="spec-label">Material Lead Time</span>
+                                        <span class="spec-value" id="spec-lead-time">-</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">Moving Price</span>
+                                        <span class="spec-value" id="spec-price">-</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">ABC Class (Value)</span>
+                                        <span class="spec-value" id="spec-abc">-</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">XYZ Class (Variability)</span>
+                                        <span class="spec-value" id="spec-xyz">-</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">Inventory Gap</span>
+                                        <span class="spec-value" id="spec-gap">-</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">Recommended Order Qty</span>
+                                        <span class="spec-value" id="spec-order-qty">-</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">Estimated Order Cost</span>
+                                        <span class="spec-value" id="spec-order-cost">-</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">Suggested Action</span>
+                                        <span class="action-badge" id="spec-action">-</span>
+                                    </div>
+                                    <div class="spec-item full-width">
+                                        <span class="spec-label">Inventory Status</span>
+                                        <span class="status-pill" id="spec-status">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. INVENTORY DIRECTORY VIEW -->
+                <section id="view-directory" class="view-section">
+                    <div class="table-card">
+                        <div class="table-toolbar">
+                            <div class="search-box">
+                                <i data-lucide="search"></i>
+                                <input type="text" id="table-search" placeholder="Search by Material ID...">
+                            </div>
+                            <div class="filters-group">
+                                <select id="filter-abc" class="form-select">
+                                    <option value="all">ABC Class (All)</option>
+                                    <option value="A">Class A (High Value)</option>
+                                    <option value="B">Class B (Medium Value)</option>
+                                    <option value="C">Class C (Low Value)</option>
+                                </select>
+                                <select id="filter-xyz" class="form-select">
+                                    <option value="all">XYZ Class (All)</option>
+                                    <option value="X">Class X (Stable)</option>
+                                    <option value="Y">Class Y (Moderate)</option>
+                                    <option value="Z">Class Z (Erratic)</option>
+                                </select>
+                                <select id="filter-action" class="form-select">
+                                    <option value="all">Suggested Action (All)</option>
+                                    <option value="Order Material">Order Material</option>
+                                    <option value="No Action Required">No Action Required</option>
+                                </select>
+                                <select id="filter-status" class="form-select">
+                                    <option value="all">Status (All)</option>
+                                    <option value="Sufficient">Sufficient</option>
+                                    <option value="Low">Low</option>
+                                    <option value="Critical">Critical</option>
+                                </select>
+                                <button id="btn-download-csv" class="btn btn-secondary">
+                                    <i data-lucide="download"></i> Download CSV
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Data Table -->
+                        <div class="table-responsive">
+                            <table class="data-table" id="inventory-table">
+                                <thead>
+                                    <tr>
+                                        <th>Material ID</th>
+                                        <th>ABC / XYZ</th>
+                                        <th>Unrestricted Stock</th>
+                                        <th>Lead Time</th>
+                                        <th>Moving Price</th>
+                                        <th>Safety Stock</th>
+                                        <th>Reorder Point</th>
+                                        <th>Status</th>
+                                        <th>Suggested Action</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="inventory-table-body">
+                                    <!-- Dynamic rows will be inserted here -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        <div class="table-pagination">
+                            <span class="pagination-info" id="pagination-info">Showing 1-15 of 2553 materials</span>
+                            <div class="pagination-controls">
+                                <button id="prev-page-btn" class="btn btn-pagination" disabled><i data-lucide="chevron-left"></i></button>
+                                <span id="current-page-num" class="page-num">1</span>
+                                <button id="next-page-btn" class="btn btn-pagination"><i data-lucide="chevron-right"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 3. PIPELINE CONTROL VIEW -->
+                <section id="view-pipeline" class="view-section">
+                    <div class="pipeline-layout">
+                        <!-- Upload & Configuration -->
+                        <div class="dashboard-card pipeline-setup">
+                            <div class="card-header">
+                                <h4><i data-lucide="upload-cloud"></i> Upload New Datasets</h4>
+                            </div>
+                            <p class="section-desc">To update the inventory forecast and safety stock parameters, upload the latest monthly Excel files and run the automation pipeline.</p>
+                            
+                            <form id="pipeline-upload-form" class="upload-form">
+                                <!-- Upload 1: Consumption -->
+                                <div class="upload-zone" id="zone-consumption">
+                                    <input type="file" id="file-consumption" accept=".xlsx, .xls" class="hidden-file-input">
+                                    <i data-lucide="bar-chart-3" class="upload-icon"></i>
+                                    <h5>Monthly Consumption Excel</h5>
+                                    <p class="file-name-label">Drag & drop or click to browse</p>
+                                    <span class="file-spec">Must contain: material_id, date/month columns</span>
+                                </div>
+
+                                <!-- Upload 2: LeadTime -->
+                                <div class="upload-zone" id="zone-leadtime">
+                                    <input type="file" id="file-leadtime" accept=".xlsx, .xls" class="hidden-file-input">
+                                    <i data-lucide="file-spreadsheet" class="upload-icon"></i>
+                                    <h5>Material Master / LeadTime Excel</h5>
+                                    <p class="file-name-label">Drag & drop or click to browse</p>
+                                    <span class="file-spec">Must contain: material_id, lead time, price, unrestricted</span>
+                                </div>
+
+                                <button type="submit" id="btn-run-pipeline" class="btn btn-primary btn-block btn-large">
+                                    <i data-lucide="play"></i> Run Automation Pipeline
+                                </button>
+                            </form>
+
+                            <!-- Pipeline Progress Bar -->
+                            <div class="pipeline-progress-container hidden" id="pipeline-progress-container">
+                                <div class="progress-info">
+                                    <span id="pipeline-progress-status">Running pipeline...</span>
+                                    <span id="pipeline-progress-percent">0%</span>
+                                </div>
+                                <div class="progress-bar-bg">
+                                    <div class="progress-bar-fill" id="pipeline-progress-fill"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pipeline Stages & Terminal Output -->
+                        <div class="pipeline-execution">
+                            <!-- Stage Indicators -->
+                            <div class="dashboard-card stages-card">
+                                <div class="card-header">
+                                    <h4><i data-lucide="check-square"></i> Execution Stages</h4>
+                                </div>
+                                <div class="stages-indicator-list">
+                                    <div class="stage-item" id="stage-0">
+                                        <div class="stage-status-icon pending"></div>
+                                        <span class="stage-name">1. Data Validation & Cleaning</span>
+                                    </div>
+                                    <div class="stage-item" id="stage-1">
+                                        <div class="stage-status-icon pending"></div>
+                                        <span class="stage-name">2. Feature Engineering</span>
+                                    </div>
+                                    <div class="stage-item" id="stage-2">
+                                        <div class="stage-status-icon pending"></div>
+                                        <span class="stage-name">3. Update Historical Dataset</span>
+                                    </div>
+                                    <div class="stage-item" id="stage-3">
+                                        <div class="stage-status-icon pending"></div>
+                                        <span class="stage-name">4. SES Forecasting</span>
+                                    </div>
+                                    <div class="stage-item" id="stage-4">
+                                        <div class="stage-status-icon pending"></div>
+                                        <span class="stage-name">5. Inventory Planning</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Live Console -->
+                            <div class="dashboard-card console-card">
+                                <div class="card-header">
+                                    <h4><i data-lucide="terminal"></i> Live Pipeline Logs</h4>
+                                    <button id="btn-clear-console" class="btn btn-text">Clear</button>
+                                </div>
+                                <div class="console-output" id="console-output">
+                                    <div class="console-line system">Console initialized. Ready to execute pipeline.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 4. EXECUTIVE ANALYTICS VIEW -->
+                <section id="view-analytics" class="view-section">
+                    <!-- Global KPI Cards -->
+                    <div class="kpi-grid">
+                        <div class="kpi-card">
+                            <div class="kpi-icon-wrapper blue"><i data-lucide="boxes"></i></div>
+                            <div class="kpi-details">
+                                <span class="kpi-label">Total Materials Tracked</span>
+                                <h3 class="kpi-value" id="global-total-materials">-</h3>
+                            </div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-icon-wrapper"><i data-lucide="dollar-sign"></i></div>
+                            <div class="kpi-details">
+                                <span class="kpi-label">Total Projected Order Cost</span>
+                                <h3 class="kpi-value" id="global-total-cost">-</h3>
+                            </div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-icon-wrapper"><i data-lucide="shopping-cart"></i></div>
+                            <div class="kpi-details">
+                                <span class="kpi-label">Materials to Reorder</span>
+                                <h3 class="kpi-value" id="global-materials-to-order">-</h3>
+                            </div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-icon-wrapper"><i data-lucide="clock"></i></div>
+                            <div class="kpi-details">
+                                <span class="kpi-label">Average Lead Time</span>
+                                <h3 class="kpi-value" id="global-avg-leadtime">-</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Analytical Charts Layout -->
+                    <div class="analytics-layout">
+                        <!-- Chart 1: Action Breakdown -->
+                        <div class="dashboard-card">
+                            <div class="card-header">
+                                <h4>Suggested Action Distribution</h4>
+                            </div>
+                            <div class="chart-container-large">
+                                <canvas id="chart-actions"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Chart 2: Inventory Status -->
+                        <div class="dashboard-card">
+                            <div class="card-header">
+                                <h4>Inventory Status Breakdown</h4>
+                            </div>
+                            <div class="chart-container-large">
+                                <canvas id="chart-status"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Chart 3: Cost by ABC Class -->
+                        <div class="dashboard-card">
+                            <div class="card-header">
+                                <h4>Projected Order Cost by ABC Class</h4>
+                            </div>
+                            <div class="chart-container-large">
+                                <canvas id="chart-abc-cost"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Chart 4: ABC/XYZ Matrix Table -->
+                        <div class="dashboard-card">
+                            <div class="card-header">
+                                <h4>ABC-XYZ Material Matrix</h4>
+                            </div>
+                            <div class="matrix-container">
+                                <table class="matrix-table">
+                                    <thead>
+                                        <tr>
+                                            <th>ABC / XYZ</th>
+                                            <th>X (Stable)</th>
+                                            <th>Y (Moderate)</th>
+                                            <th>Z (Erratic)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <th class="row-header">A (High Value)</th>
+                                            <td id="matrix-AX" class="matrix-cell">-</td>
+                                            <td id="matrix-AY" class="matrix-cell">-</td>
+                                            <td id="matrix-AZ" class="matrix-cell">-</td>
+                                        </tr>
+                                        <tr>
+                                            <th class="row-header">B (Mid Value)</th>
+                                            <td id="matrix-BX" class="matrix-cell">-</td>
+                                            <td id="matrix-BY" class="matrix-cell">-</td>
+                                            <td id="matrix-BZ" class="matrix-cell">-</td>
+                                        </tr>
+                                        <tr>
+                                            <th class="row-header">C (Low Value)</th>
+                                            <td id="matrix-CX" class="matrix-cell">-</td>
+                                            <td id="matrix-CY" class="matrix-cell">-</td>
+                                            <td id="matrix-CZ" class="matrix-cell">-</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Glowing Loading Overlay (Requested Rectangular Small Loading Tab) -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+        <div class="loading-card">
+            <div class="loading-spinner"></div>
+            <span>loading...</span>
+        </div>
+    </div>
+
+    <!-- Custom Javascript -->
+    <script src="/static/js/main.js"></script>
+</body>
+</html>

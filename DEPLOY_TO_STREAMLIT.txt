@@ -1,0 +1,93 @@
+# Streamlit Community Cloud Deployment Guide
+# Safety Stock Automation Portal
+
+How to deploy on Streamlit Community Cloud (share.streamlit.io) for free
+
+---
+
+## Step-by-Step Instructions
+
+### Step 1 — Install Git (if not done)
+Download from: https://git-scm.com/download/win
+
+### Step 2 — Create a GitHub Repository
+1. Go to https://github.com and log in (or create a free account)
+2. Click "New repository"
+3. Name it: `safety-stock-portal`
+4. Set to **Public** (required for Streamlit free tier)
+5. Click "Create repository"
+
+### Step 3 — Push Your Project to GitHub
+Open a terminal in your project folder and run:
+
+    git init
+    git add .
+    git commit -m "Initial Streamlit app"
+    git branch -M main
+    git remote add origin https://github.com/YOUR_USERNAME/safety-stock-portal.git
+    git push -u origin main
+
+### Step 4 — Deploy on Streamlit Community Cloud
+1. Go to https://share.streamlit.io
+2. Sign in with your GitHub account
+3. Click "New app"
+4. Fill in:
+   - Repository: `YOUR_USERNAME/safety-stock-portal`
+   - Branch: `main`
+   - Main file path: `streamlit_app.py`
+5. Click "Deploy!"
+
+Streamlit will install dependencies from requirements.txt automatically.
+Your app will be live at: https://YOUR_USERNAME-safety-stock-portal-streamlit-app-XXXX.streamlit.app
+
+### Step 5 — Share the Link
+Copy the URL and send it to your friends/mentor.
+The app runs 24/7 for free on Streamlit Community Cloud.
+
+---
+
+## Important Notes
+
+### Database
+The app uses SQLite (built into Python). On first launch, it automatically
+imports data from the CSV files already in the repository:
+- Client_deliverable/Prediction.csv
+- Data_SES/updated_historical_dataset.csv
+
+Make sure these CSV files are committed to the repository.
+
+### Login Credentials
+- Username: admin    Password: safetystock123
+- Username: user     Password: stockadmin@2024
+
+### Local Testing (before deploying)
+Install Streamlit and run locally:
+
+    pip install -r requirements.txt
+    streamlit run streamlit_app.py
+
+Then open http://localhost:8501 in your browser.
+
+---
+
+## Files to Commit to GitHub
+
+Make sure ALL of these are committed:
+- streamlit_app.py
+- pages/ (all 6 page files)
+- utils/ (styles.py, auth.py, charts.py, __init__.py)
+- db.py
+- python_script/ (all pipeline scripts including run_pipeline.py)
+- .streamlit/config.toml
+- requirements.txt
+- Client_deliverable/Prediction.csv
+- Data_SES/updated_historical_dataset.csv
+- Data_SES/ (other data files needed by pipeline)
+- Data/ (original data files)
+
+## Files to EXCLUDE (add to .gitignore)
+- safety_stock.db (will be recreated on first run)
+- __pycache__/
+- .env
+- Monthly_upload/ (temp folder)
+- *.pyc
