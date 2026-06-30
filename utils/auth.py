@@ -23,6 +23,17 @@ def check_auth():
 def render_sidebar_brand():
     """Render the sidebar branding and logout button."""
     with st.sidebar:
+        # Force sidebar to be displayed (overriding login screen display:none)
+        st.markdown("""
+        <style>
+            [data-testid="collapsedControl"] {
+                display: block !important;
+            }
+            section[data-testid="stSidebar"] {
+                display: block !important;
+            }
+        </style>
+        """, unsafe_allow_html=True)
         username = st.session_state.get("username", "Admin")
         st.markdown(f"""
         <div class="sidebar-brand">

@@ -459,7 +459,7 @@ if records:
         </table>
     </div>
     """
-    st.markdown(textwrap.dedent(table_html), unsafe_allow_html=True)
+    st.markdown("\n".join(line.strip() for line in table_html.split("\n")), unsafe_allow_html=True)
 
     # ── Pagination controls ───────────────────────────────────────────────────
     start_rec = row_offset + 1

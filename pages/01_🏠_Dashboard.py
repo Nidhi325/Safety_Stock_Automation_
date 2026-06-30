@@ -298,4 +298,4 @@ with specs_col:
   </div>
 </div>
 """
-    st.markdown(specs_card_html, unsafe_allow_html=True)
+    st.markdown("\n".join(line.strip() for line in specs_card_html.split("\n")), unsafe_allow_html=True)
