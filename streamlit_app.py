@@ -14,14 +14,14 @@ st.set_page_config(
     page_title="Safety Stock Portal — Login",
     page_icon="🔐",
     layout="centered",
-    initial_sidebar_state="collapsed",
+    initial_sidebar_state="expanded",
 )
 
 st.markdown(LOGIN_CSS, unsafe_allow_html=True)
 
 # If already authenticated, redirect to dashboard
 if st.session_state.get("authenticated", False):
-    st.switch_page("pages/01_Dashboard.py")
+    st.switch_page("pages/01_🏠_Dashboard.py")
 
 # ── Centered login card ──────────────────────────────────────────────────────
 st.markdown("""
@@ -76,7 +76,7 @@ with col2:
             st.error("Please enter both username and password.")
         elif login(username, password):
             st.success("Login successful! Redirecting...")
-            st.switch_page("pages/01_Dashboard.py")
+            st.switch_page("pages/01_🏠_Dashboard.py")
         else:
             st.error("❌ Invalid username or password. Please try again.")
 
