@@ -614,3 +614,20 @@ def get_recommendations():
                      "title": f"{sufficient} Materials ({pct}%) are Well-Stocked",
                      "body": f"**{sufficient}** materials have sufficient inventory above safety stock. No action needed."})
     return recs
+# Auto-initialize database on import for Streamlit Cloud
+try:
+    import streamlit as st
+    @st.cache_resource
+    def _auto_init_db():
+        db_init()
+        conn = get_connection()
+        c = conn.cursor()
+        c.execute('SELECT COUNT(*) FROM predictions')
+        count = c.fetchone()[0]
+        conn.close()
+        if count == 0:
+            import_predictions_csv()
+            import_historical_csv()
+    _auto_init_db()
+except Exception:
+    pass
