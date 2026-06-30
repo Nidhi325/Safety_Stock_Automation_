@@ -14,6 +14,7 @@ st.set_page_config(
     page_title="Predictions Export — Safety Stock Portal",
     page_icon="📥",
     layout="wide",
+    initial_sidebar_state="expanded",
 )
 
 # ── Apply global CSS, auth guard, sidebar brand ───────────────────────────────

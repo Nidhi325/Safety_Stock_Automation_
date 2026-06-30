@@ -16,6 +16,7 @@ st.set_page_config(
     page_title="Historical Data — Safety Stock Portal",
     page_icon="📋",
     layout="wide",
+    initial_sidebar_state="expanded",
 )
 
 # ── Apply shared CSS & authentication ────────────────────────────────────────

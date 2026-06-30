@@ -65,6 +65,7 @@ st.set_page_config(
     page_title="Pipeline Control — Safety Stock Portal",
     page_icon="⚙️",
     layout="wide",
+    initial_sidebar_state="expanded",
 )
 
 # ── Apply styles, auth, and sidebar ───────────────────────────────────────────

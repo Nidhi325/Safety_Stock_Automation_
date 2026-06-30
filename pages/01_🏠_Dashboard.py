@@ -24,6 +24,7 @@ st.set_page_config(
     page_title="Dashboard — Safety Stock Portal",
     page_icon="📊",
     layout="wide",
+    initial_sidebar_state="expanded",
 )
 
 # ── Global CSS ────────────────────────────────────────────────────────────────
