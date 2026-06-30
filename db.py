@@ -626,8 +626,10 @@ try:
         count = c.fetchone()[0]
         conn.close()
         if count == 0:
-            import_predictions_csv()
-            import_historical_csv()
+            pred_path = PROJECT_ROOT / 'Client_deliverable' / 'Prediction.csv'
+            hist_path = PROJECT_ROOT / 'Data_SES' / 'updated_historical_dataset.csv'
+            import_predictions_csv(str(pred_path))
+            import_historical_csv(str(hist_path))
     _auto_init_db()
 except Exception:
     pass
