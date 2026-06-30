@@ -1,3 +1,4 @@
+import textwrap
 import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -519,7 +520,7 @@ else:
         </div>
     </div>
     """
-    st.markdown(table_html, unsafe_allow_html=True)
+    st.markdown(textwrap.dedent(table_html), unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────────────────────────────────────
 # PAGINATION CONTROLS

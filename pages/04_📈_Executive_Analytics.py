@@ -1,3 +1,4 @@
+import textwrap
 """
 04_Executive_Analytics.py
 --------------------------
@@ -310,7 +311,7 @@ with row2_r:
         </table>
     </div>
     """
-    st.markdown(matrix_html, unsafe_allow_html=True)
+    st.markdown(textwrap.dedent(matrix_html), unsafe_allow_html=True)
 
     # Legend below matrix
     st.markdown(

@@ -1,3 +1,4 @@
+import textwrap
 import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -90,7 +91,7 @@ if st.session_state.get("_dir_last_filter") != filter_key:
 current_page = st.session_state.dir_page
 
 # ── Fetch Data ────────────────────────────────────────────────────────────────
-with st.spinner("Loading inventory data…"):
+with st.spinner("loading..."):
     result = db.get_inventory_list(
         page=current_page,
         per_page=PER_PAGE,
@@ -254,7 +255,7 @@ table_html = f"""
 </div>
 """
 
-st.markdown(table_html, unsafe_allow_html=True)
+st.markdown(textwrap.dedent(table_html), unsafe_allow_html=True)
 
 # ── Pagination Controls ───────────────────────────────────────────────────────
 st.markdown("<div style='height:16px'></div>", unsafe_allow_html=True)

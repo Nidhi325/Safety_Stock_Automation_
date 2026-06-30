@@ -1,3 +1,4 @@
+import textwrap
 import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -285,7 +286,7 @@ with col_filters:
 
 with col_download:
     st.markdown('<p class="section-label">⬇️ Export Data</p>', unsafe_allow_html=True)
-    with st.spinner("Preparing download…"):
+    with st.spinner("loading..."):
         df_hist = db.get_all_historical_df()
     csv_hist = df_hist.to_csv(index=False).encode("utf-8")
     st.download_button(
@@ -458,7 +459,7 @@ if records:
         </table>
     </div>
     """
-    st.markdown(table_html, unsafe_allow_html=True)
+    st.markdown(textwrap.dedent(table_html), unsafe_allow_html=True)
 
     # ── Pagination controls ───────────────────────────────────────────────────
     start_rec = row_offset + 1

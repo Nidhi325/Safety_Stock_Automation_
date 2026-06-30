@@ -14,10 +14,21 @@ st.set_page_config(
     page_title="Safety Stock Portal — Login",
     page_icon="🔐",
     layout="centered",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="collapsed",
 )
 
 st.markdown(LOGIN_CSS, unsafe_allow_html=True)
+
+st.markdown("""
+    <style>
+        [data-testid="collapsedControl"] {
+            display: none !important;
+        }
+        section[data-testid="stSidebar"] {
+            display: none !important;
+        }
+    </style>
+""", unsafe_allow_html=True)
 
 # If already authenticated, redirect to dashboard
 if st.session_state.get("authenticated", False):

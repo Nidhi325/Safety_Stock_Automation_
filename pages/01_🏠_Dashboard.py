@@ -133,11 +133,11 @@ st.session_state[_prev_key] = material_input
 should_fetch = analyze_clicked or _input_changed
 
 if should_fetch and material_input.strip():
-    with st.spinner("Loading material data..."):
+    with st.spinner("loading..."):
         result = db.get_material_details(material_input.strip())
 
     if result is None:
-        st.error(f"Material ID **{material_input.strip()}** not found in database.")
+        st.error("material id not found, try again 😞")
         # Clear any previous result so welcome state shows
         st.session_state.pop("current_material", None)
     else:
