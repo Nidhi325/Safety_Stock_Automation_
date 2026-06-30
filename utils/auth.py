@@ -19,10 +19,7 @@ def check_auth():
         if st.button("Go to Login →", type="primary"):
             st.switch_page("streamlit_app.py")
         st.stop()
-
-def render_sidebar_brand():
-    """Render the sidebar branding and logout button."""
-    with st.sidebar:
+    else:
         # Force sidebar to be displayed (overriding login screen display:none)
         st.markdown("""
         <style>
@@ -34,6 +31,10 @@ def render_sidebar_brand():
             }
         </style>
         """, unsafe_allow_html=True)
+
+def render_sidebar_brand():
+    """Render the sidebar branding and logout button."""
+    with st.sidebar:
         username = st.session_state.get("username", "Admin")
         st.markdown(f"""
         <div class="sidebar-brand">
